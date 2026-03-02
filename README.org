@@ -757,6 +757,8 @@ always go to Evil modes if you need to with ~C-z~).
 |                 | agent-shell-viewport-view-last                          | Display the last request/response interaction.                                |
 |                 | agent-shell-viewport-view-mode                          | Major mode for viewing agent shell prompts (read-only).                       |
 * Filing issues
+When filing an issue, please keep the checkboxes from the [[https://github.com/xenodium/agent-shell/blob/main/.github/ISSUE_TEMPLATE/issue.md][issue template]] and check them off as applicable. They help ensure I have enough information to help.
+
 Please read through this section before filing issues or feature requests. I won't be able to help unless I have enough information to help. This section shows how to get the details I need.
 
 - *Versions*: What version of =agent-shell=, =acp.el=, the ACP package (e.g. =claude-code-acp=), and the agent CLI (e.g. =claude=, =gemini=) are you running?

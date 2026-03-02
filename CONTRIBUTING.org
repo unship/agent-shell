@@ -1,5 +1,7 @@
 * Before Contributing
 
+When submitting a PR, please keep the checkboxes from the [[https://github.com/xenodium/agent-shell/blob/main/.github/PULL_REQUEST_TEMPLATE.md][PR template]] and check them off as applicable.
+
 Before implementing new features, please *file a feature request first* to discuss the proposal. This helps ensure alignment with the project's direction and prevents unnecessary work.
 
 As the maintainer, I must be mindful of all features I accept since I inherit the code to maintain it. Some features may be better suited as separate packages (like [[https://github.com/cmacrae/agent-shell-sidebar][agent-shell-sidebar]]).
