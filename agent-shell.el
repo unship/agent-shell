@@ -1236,7 +1236,8 @@ COMMAND, when present, may be a shell command string or an argv vector."
               :create-new (not (equal (map-elt state :last-entry-type)
                                       "agent_message_chunk"))
               :append t
-              :navigation 'never)
+              :navigation 'never
+              :render-body-images t)
              (map-put! state :last-entry-type "agent_message_chunk")))
           ((equal (map-nested-elt acp-notification '(params update sessionUpdate)) "user_message_chunk")
            (let ((new-prompt-p (not (equal (map-elt state :last-entry-type)
@@ -2344,7 +2345,8 @@ variable (see makunbound)"))
     (agent-shell-ui-delete-fragment :namespace-id (map-elt state :request-count) :block-id block-id :no-undo t)))
 
 (cl-defun agent-shell--update-fragment (&key state namespace-id block-id label-left label-right
-                                             body append create-new navigation expanded)
+                                             body append create-new navigation expanded
+                                             render-body-images)
   "Update fragment in the shell buffer.
 
 Creates or updates existing dialog using STATE's request count as namespace
@@ -2356,7 +2358,7 @@ Dialog can have LABEL-LEFT, LABEL-RIGHT, and BODY.
 
 Optional flags: APPEND text to existing content, CREATE-NEW block,
 NAVIGATION for navigation style, EXPANDED to show block expanded
-by default."
+by default, RENDER-BODY-IMAGES to enable inline image rendering in body."
   (when label-right
     (setq label-right (string-trim label-right)))
   ;; Convert non-standard multiline single-backtick code spans to fenced
@@ -2408,7 +2410,8 @@ by default."
             (when-let ((body-start (map-nested-elt range '(:body :start)))
                        (body-end (map-nested-elt range '(:body :end))))
               (narrow-to-region body-start body-end)
-              (let ((markdown-overlays-highlight-blocks agent-shell-highlight-blocks))
+              (let ((markdown-overlays-highlight-blocks agent-shell-highlight-blocks)
+                    (markdown-overlays-render-images render-body-images))
                 (markdown-overlays-put))))
           ;; Note: For now, we're skipping applying markdown overlays
           ;; on left labels as they currently carry propertized text
@@ -2419,7 +2422,8 @@ by default."
             (when-let ((label-right-start (map-nested-elt range '(:label-right :start)))
                        (label-right-end (map-nested-elt range '(:label-right :end))))
               (narrow-to-region label-right-start label-right-end)
-              (let ((markdown-overlays-highlight-blocks agent-shell-highlight-blocks))
+              (let ((markdown-overlays-highlight-blocks agent-shell-highlight-blocks)
+                    (markdown-overlays-render-images nil))
                 (markdown-overlays-put))))
           (goto-char saved-point)))))
   (with-current-buffer (map-elt state :buffer)
