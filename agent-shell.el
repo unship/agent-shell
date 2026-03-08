@@ -1149,6 +1149,10 @@ COMMAND, when present, may be a shell command string or an argv vector."
         ((null command) nil)
         (t (error "Unexpected tool-call command type: %S" (type-of command)))))
 
+(defun agent-shell--active-requests-p (state)
+  "Return non-nil if STATE has in-flight requests awaiting responses."
+  (not (zerop (map-elt state :active-request-count))))
+
 (cl-defun agent-shell--on-notification (&key state acp-notification)
   "Handle incoming ACP-NOTIFICATION using STATE."
   (cond ((equal (map-elt acp-notification 'method) "session/update")
@@ -1156,7 +1160,7 @@ COMMAND, when present, may be a shell command string or an argv vector."
           ((equal (map-nested-elt acp-notification '(params update sessionUpdate)) "tool_call")
            ;; Notification is out of context (session/prompt finished).
            ;; Cannot derive where to display, so show in minibuffer.
-           (if (zerop (map-elt state :active-request-count))
+           (if (not (agent-shell--active-requests-p state))
                (message "%s %s (stale, consider reporting to ACP agent)"
                         (agent-shell--make-status-kind-label
                          :status (map-nested-elt acp-notification '(params update status))
@@ -1208,7 +1212,7 @@ COMMAND, when present, may be a shell command string or an argv vector."
           ((equal (map-nested-elt acp-notification '(params update sessionUpdate)) "agent_thought_chunk")
            ;; Notification is out of context (session/prompt finished).
            ;; Cannot derive where to display, so show in minibuffer.
-           (if (zerop (map-elt state :active-request-count))
+           (if (not (agent-shell--active-requests-p state))
                (message "%s %s (stale, consider reporting to ACP agent): %s"
                         agent-shell-thought-process-icon
                         (propertize "Thought process" 'face font-lock-doc-markup-face)
@@ -1238,7 +1242,7 @@ COMMAND, when present, may be a shell command string or an argv vector."
           ((equal (map-nested-elt acp-notification '(params update sessionUpdate)) "agent_message_chunk")
            ;; Notification is out of context (session/prompt finished).
            ;; Cannot derive where to display, so show in minibuffer.
-           (if (zerop (map-elt state :active-request-count))
+           (if (not (agent-shell--active-requests-p state))
                (message "Agent message (stale, consider reporting to ACP agent): %s"
                         (truncate-string-to-width (map-nested-elt acp-notification '(params update content text)) 100))
              (unless (equal (map-elt state :last-entry-type) "agent_message_chunk")
@@ -1298,7 +1302,7 @@ COMMAND, when present, may be a shell command string or an argv vector."
           ((equal (map-nested-elt acp-notification '(params update sessionUpdate)) "tool_call_update")
            ;; Notification is out of context (session/prompt finished).
            ;; Cannot derive where to display, so show in minibuffer.
-           (if (zerop (map-elt state :active-request-count))
+           (if (not (agent-shell--active-requests-p state))
                (message "%s %s (stale, consider reporting to ACP agent)"
                         (agent-shell--make-status-kind-label
                          :status (map-nested-elt acp-notification '(params update status))
